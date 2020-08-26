@@ -1,1 +1,5 @@
 .idea
+secret_setting.py
+venv
+db.sqlite3
+__pycache__
