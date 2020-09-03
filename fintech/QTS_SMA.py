@@ -20,6 +20,7 @@ def ma(stock):  # 計算訓練期每天的MA(1-256) 回傳二維陣列,stock長�
 def fitness(stock, stre):  # 給策略參數  回傳持有區間,收益
     date_ma, l = ma(stock)
     fund = 1000000  # 資金
+    init_fund = fund
     hold = []
     b = 0
     for d in range(256, l):  # 訓練期開始
@@ -28,7 +29,7 @@ def fitness(stock, stre):  # 給策略參數  回傳持有區間,收益
         else:
             tmp = 1
         if (date_ma[d - 256][int(stre[0])] <= date_ma[d - 256][int(stre[1])] and
-                date_ma[d - 255][int(stre[0])] > date_ma[d - 255][int(stre[1])] and b == 0):
+                date_ma[d - 255][int(stre[0])] > date_ma[d - 255][int(stre[1])] and b == 0 and d != l - 1):
             remain = float(fund % float(stock[d]))
             shares = int((fund - remain) / float(stock[d]))
             fund -= shares * float(stock[d])
@@ -47,12 +48,13 @@ def fitness(stock, stre):  # 給策略參數  回傳持有區間,收益
                 hold.append(float(stock[d]))
             else:
                 hold.append('NaN')
-    return hold, fund
+    return hold, fund - init_fund
 
 
 def QTS(stock):  # 給股價 回傳最佳策略,收益,持有
     date_ma, l = ma(stock)
     fund = 1000000  #
+    init_fund = fund
     beta = [0.5] * 32
     theta = 0.002
     partical = 30
@@ -90,7 +92,7 @@ def QTS(stock):  # 給股價 回傳最佳策略,收益,持有
                 else:
                     tmp = 1
                 if (date_ma[d - 256][int(stre[0])] <= date_ma[d - 256][int(stre[1])] and
-                        date_ma[d - 255][int(stre[0])] > date_ma[d - 255][int(stre[1])] and b == 0):
+                        date_ma[d - 255][int(stre[0])] > date_ma[d - 255][int(stre[1])] and b == 0 and d != l - 1):
                     remain = float(fund % float(stock[d]))
                     shares = int((fund - remain) / float(stock[d]))
                     fund -= shares * float(stock[d])
@@ -130,4 +132,4 @@ def QTS(stock):  # 給股價 回傳最佳策略,收益,持有
         pworst = [0] * 32
         pworst_prof = 2000000
 
-    return best_stre, gbest_prof, best_hold
+    return best_stre, gbest_prof - init_fund, best_hold
