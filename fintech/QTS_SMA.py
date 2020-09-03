@@ -14,6 +14,7 @@ def sma(stock):  # 計算訓練期每天的MA(1-256) 回傳二維陣列,stock長
             date_ma[i - 1][j - 1] = numer / denomi
             numer = 0
             denomi = 0
+    # write_csv(date_ma,ID)
     return date_ma, l
 
 
@@ -28,14 +29,16 @@ def fitness(stock, stre):  # 給策略參數  回傳持有區間,收益
             tmp = 0
         else:
             tmp = 1
-        if (date_ma[d - 256][int(stre[0])] <= date_ma[d - 256][int(stre[1])] and
-                date_ma[d - 255][int(stre[0])] > date_ma[d - 255][int(stre[1])] and b == 0 and d != l - 1):
+        if (date_ma[d - 255][int(stre[0])] > date_ma[d - 255][int(stre[1])] and
+                date_ma[d - 256][int(stre[0])] <= date_ma[d - 256][int(stre[1])] and d != l - 1 and b == 0):
             remain = float(fund % float(stock[d]))
             shares = int((fund - remain) / float(stock[d]))
             fund -= shares * float(stock[d])
             b = 1
-        elif (date_ma[d - 256][int(stre[2])] >= date_ma[d - 256][int(stre[3])] and
-              date_ma[d - 255][int(stre[2])] < date_ma[d - 255][int(stre[3])] and b == 1):
+            print(date_ma[d - 255][int(stre[0])], '>', date_ma[d - 255][int(stre[1])],
+                  date_ma[d - 256][int(stre[0])], '<', date_ma[d - 256][int(stre[1])], stre[0], stre[1])
+        elif (date_ma[d - 255][int(stre[2])] < date_ma[d - 255][int(stre[3])] and
+              date_ma[d - 256][int(stre[2])] >= date_ma[d - 256][int(stre[3])] and b == 1):
             fund += float(stock[d]) * shares + remain
             b = 0
         elif (d == l - 1 and b == 1):
@@ -57,16 +60,14 @@ def QTS(stock):  # 給股價 回傳最佳策略,收益,持有
     init_fund = fund
     beta = [0.5] * 32
     theta = 0.002
-    partical = 30
-    generation = 1000
+    partical = 10
+    generation = 30
     pm = [[0] * 32 for _ in range(partical)]
     gbest = [0] * 32
     gbest_prof = 0
     pworst = [0] * 32
     pworst_prof = 2000000
-
     stre = [0] * 4
-    best_stre = [0] * 4
     hold = []
     b = 0  #
     stre_sum = 0
@@ -91,14 +92,16 @@ def QTS(stock):  # 給股價 回傳最佳策略,收益,持有
                     tmp = 0
                 else:
                     tmp = 1
-                if (date_ma[d - 256][int(stre[0])] <= date_ma[d - 256][int(stre[1])] and
-                        date_ma[d - 255][int(stre[0])] > date_ma[d - 255][int(stre[1])] and b == 0 and d != l - 1):
+                if (date_ma[d - 255][int(stre[0])] > date_ma[d - 255][int(stre[1])] and
+                        date_ma[d - 256][int(stre[0])] <= date_ma[d - 256][int(stre[1])] and d != l - 1 and b == 0):
                     remain = float(fund % float(stock[d]))
                     shares = int((fund - remain) / float(stock[d]))
                     fund -= shares * float(stock[d])
                     b = 1
-                elif (date_ma[d - 256][int(stre[2])] >= date_ma[d - 256][int(stre[3])] and
-                      date_ma[d - 255][int(stre[2])] < date_ma[d - 255][int(stre[3])] and b == 1):
+                    print(date_ma[d - 255][int(stre[0])], '>', date_ma[d - 255][int(stre[1])],
+                          date_ma[d - 256][int(stre[0])], '<', date_ma[d - 256][int(stre[1])], stre[0], stre[1])
+                elif (date_ma[d - 255][int(stre[2])] < date_ma[d - 255][int(stre[3])] and
+                      date_ma[d - 256][int(stre[2])] >= date_ma[d - 256][int(stre[3])] and b == 1):
                     fund += float(stock[d]) * shares + remain
                     b = 0
                 elif (d == l - 1 and b == 1):
@@ -112,11 +115,18 @@ def QTS(stock):  # 給股價 回傳最佳策略,收益,持有
                     else:
                         hold.append('NaN')
             # hold,fund = fitness(date_ma,stre)
-            if (fund > gbest_prof):
+            # print(shares)
+            # print(fund)
+            # print(hold)
+            if (fund >= gbest_prof):
                 gbest_prof = fund
                 best_stre = stre
                 best_hold = hold
                 gbest = pm[p]
+                b1 = best_stre[0] + 1
+                b2 = best_stre[1] + 1
+                s1 = best_stre[2] + 1
+                s2 = best_stre[3] + 1
             if (fund < pworst_prof):
                 pworst = pm[p]
             hold = []  #
@@ -131,5 +141,6 @@ def QTS(stock):  # 給股價 回傳最佳策略,收益,持有
         # }
         pworst = [0] * 32
         pworst_prof = 2000000
-
-    return best_stre, gbest_prof - init_fund, best_hold
+    ddic = {'stock price': stock[256:], 'holding period': best_hold, 'profit': gbest_prof-init_fund,
+            'strategy': {'buy1': b1, 'buy2': b2, 'sell1': s1, 'sell2': s2}}
+    return ddic
