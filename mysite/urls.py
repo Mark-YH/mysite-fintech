@@ -22,5 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/test/', test),
     path('api/ma/custom/', custom),
-    path('api/recommend/', getFitness),
+    path('api/ma/recommend/', recommend_sma),
 ]
