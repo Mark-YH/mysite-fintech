@@ -1,7 +1,7 @@
 import random
 
 
-def ma(stock):  # 計算訓練期每天的MA(1-256) 回傳二維陣列,stock長度
+def sma(stock):  # 計算訓練期每天的MA(1-256) 回傳二維陣列,stock長度
     l = len(stock)
     date_ma = [[0] * 256 for _ in range(l - 255)]
     numer = 0
@@ -9,7 +9,7 @@ def ma(stock):  # 計算訓練期每天的MA(1-256) 回傳二維陣列,stock長�
     for i in range(1, l - 254):  # i代表每個訓練天數
         for j in range(1, 257):  # j代表訓練天數的MA(1-256)
             for k in range(1, j + 1):  # k計算MA[j]
-                numer += float(stock[255 + i - j])
+                numer += float(stock[255 + i - k])
                 denomi += 1
             date_ma[i - 1][j - 1] = numer / denomi
             numer = 0
@@ -18,7 +18,7 @@ def ma(stock):  # 計算訓練期每天的MA(1-256) 回傳二維陣列,stock長�
 
 
 def fitness(stock, stre):  # 給策略參數  回傳持有區間,收益
-    date_ma, l = ma(stock)
+    date_ma, l = sma(stock)
     fund = 1000000  # 資金
     init_fund = fund
     hold = []
@@ -52,7 +52,7 @@ def fitness(stock, stre):  # 給策略參數  回傳持有區間,收益
 
 
 def QTS(stock):  # 給股價 回傳最佳策略,收益,持有
-    date_ma, l = ma(stock)
+    date_ma, l = sma(stock)
     fund = 1000000  #
     init_fund = fund
     beta = [0.5] * 32
