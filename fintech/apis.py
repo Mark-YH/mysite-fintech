@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import fintech.QTS_SMA as SMA
+import json
 
 
 @require_http_methods(["POST"])
@@ -37,7 +38,7 @@ def getFitness(request):
                      111.112503, 112.727501, 109.375000, 113.010002, 115.010002, 114.907501, 114.607498, 115.562500,
                      115.707497, 118.275002, 124.370003, 125.857498, 124.824997, 126.522499, 125.010002, 124.807503,
                      129.04]
-
+    # TODO: 從資料庫抓股價
     stock_price = []
     for i in range(256, len(ma_stockPrice)):
         stock_price.append(ma_stockPrice[i])
@@ -84,16 +85,14 @@ def custom(request):
                      111.112503, 112.727501, 109.375000, 113.010002, 115.010002, 114.907501, 114.607498, 115.562500,
                      115.707497, 118.275002, 124.370003, 125.857498, 124.824997, 126.522499, 125.010002, 124.807503,
                      129.04]
-    strategy = {'buy1': 5, 'buy2': 10, 'sell1': 3, 'sell4': 4}
-    profit = 0
+    body = json.loads(request.body)
+    strategy = {'buy1': body['buy1'], 'buy2': body['buy2'], 'sell1': body['sell1'], 'sell2': body['sell2']}
+    holding_period, profit = SMA.fitness(ma_stockPrice, [body['buy1'], body['buy2'], body['sell1'], body['sell2']])
+    # TODO: 從資料庫抓股價
     stock_price = []
-    holding_period = []
+
     for i in range(256, len(ma_stockPrice)):
         stock_price.append(ma_stockPrice[i])
-        holding_period.append(ma_stockPrice[i])
-    holding_period[3] = 'NaN'
-    holding_period[9] = 'NaN'
-    holding_period[20] = 'NaN'
 
     context = {'stock price': stock_price, 'holding period': holding_period, 'profit': profit, 'strategy': strategy}
     return JsonResponse(context)
