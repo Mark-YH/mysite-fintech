@@ -16,8 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from fintech.views import *
+from fintech.apis import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/test/', test),
+    path('api/ma/custom/', custom),
+    path('api/recommend/', getFitness),
 ]
