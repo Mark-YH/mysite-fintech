@@ -35,8 +35,8 @@ def fitness(stock, stre):  # 給策略參數  回傳持有區間,收益
             shares = int((fund - remain) / float(stock[d]))
             fund -= shares * float(stock[d])
             b = 1
-            print(date_ma[d - 255][int(stre[0])], '>', date_ma[d - 255][int(stre[1])],
-                  date_ma[d - 256][int(stre[0])], '<', date_ma[d - 256][int(stre[1])], stre[0], stre[1])
+            # print(date_ma[d - 255][int(stre[0])], '>', date_ma[d - 255][int(stre[1])],
+            #       date_ma[d - 256][int(stre[0])], '<', date_ma[d - 256][int(stre[1])], stre[0], stre[1])
         elif (date_ma[d - 255][int(stre[2])] < date_ma[d - 255][int(stre[3])] and
               date_ma[d - 256][int(stre[2])] >= date_ma[d - 256][int(stre[3])] and b == 1):
             fund += float(stock[d]) * shares + remain
@@ -98,8 +98,8 @@ def QTS(stock):  # 給股價 回傳最佳策略,收益,持有
                     shares = int((fund - remain) / float(stock[d]))
                     fund -= shares * float(stock[d])
                     b = 1
-                    print(date_ma[d - 255][int(stre[0])], '>', date_ma[d - 255][int(stre[1])],
-                          date_ma[d - 256][int(stre[0])], '<', date_ma[d - 256][int(stre[1])], stre[0], stre[1])
+                    # print(date_ma[d - 255][int(stre[0])], '>', date_ma[d - 255][int(stre[1])],
+                    #       date_ma[d - 256][int(stre[0])], '<', date_ma[d - 256][int(stre[1])], stre[0], stre[1])
                 elif (date_ma[d - 255][int(stre[2])] < date_ma[d - 255][int(stre[3])] and
                       date_ma[d - 256][int(stre[2])] >= date_ma[d - 256][int(stre[3])] and b == 1):
                     fund += float(stock[d]) * shares + remain
