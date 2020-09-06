@@ -23,4 +23,5 @@ urlpatterns = [
     path('api/test/', test),
     path('api/ma/custom/', custom),
     path('api/ma/recommend/', recommend_sma),
+    path('api/stock/list/', get_stock_list),
 ]

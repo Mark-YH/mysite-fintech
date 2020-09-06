@@ -5,9 +5,27 @@ import fintech.QTS_SMA as SMA
 import json
 
 
+def get_stock_list(request):
+    if request.method == 'GET':
+        try:
+            cursor = connection.cursor()
+            sql = ("select `Symbol` from 'stocks'")
+            cursor.execute(sql)
+            stocks = []
+            for items in cursor.fetchall():
+                stocks.append(items[0])
+            return JsonResponse({'stock list': stocks})
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'database connection error'})
+        return JsonResponse({'status': 'ok'})
+
+    return JsonResponse({'status': 'fail'})
+
+
 @require_http_methods(["POST"])
 def recommend_sma(request):
-    symbol = 'AAPL'
+    symbol = 'CSCO'
     body = json.loads(request.body)
     stock_data = get_stock_price(symbol, body['start'], body['end'])
 
@@ -17,7 +35,7 @@ def recommend_sma(request):
 def get_stock_price(symbol, start, end):
     try:
         cursor = connection.cursor()
-        sql = ("select `Date`, `Adj Close` from Fintech.{} where `Date` between '{}' and '{}'") \
+        sql = ("select `Date`, `Adj Close` from {} where `Date` between '{}' and '{}'") \
             .format(symbol, start, end)
         cursor.execute(sql)
         data = {'date': [], 'price': []}
@@ -25,7 +43,7 @@ def get_stock_price(symbol, start, end):
             date, price = items
             data['date'].append(date)
             data['price'].append(price)
-        sql = ("select `Date`, `Adj Close` from Fintech.{} where `Date` < '{}' ORDER BY `Date` DESC limit 256") \
+        sql = ("select `Date`, `Adj Close` from {} where `Date` < '{}' ORDER BY `Date` DESC limit 256") \
             .format(symbol, start)
         cursor.execute(sql)
         data_training = {'date': [], 'price': []}
@@ -45,7 +63,7 @@ def get_stock_price(symbol, start, end):
 
 @require_http_methods(["POST"])
 def custom(request):
-    symbol = 'AAPL'
+    symbol = 'CSCO'
     body = json.loads(request.body)
     stock_data = get_stock_price(symbol, body['start'], body['end'])
     strategy = {'buy1': body['buy1'], 'buy2': body['buy2'], 'sell1': body['sell1'], 'sell2': body['sell2']}
