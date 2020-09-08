@@ -25,8 +25,8 @@ def get_stock_list(request):
 
 @require_http_methods(["POST"])
 def recommend_sma(request):
-    symbol = 'CSCO'
     body = json.loads(request.body)
+    symbol = body['symbol']['title']
     stock_data = get_stock_price(symbol, body['start'], body['end'])
 
     return JsonResponse(SMA.QTS(stock_data['price']))
@@ -37,7 +37,6 @@ def get_stock_price(symbol, start, end):
         cursor = connection.cursor()
         sql = ("select `Date`, `Adj Close` from Fintech.{} where `Date` between '{}' and '{}'") \
             .format(symbol, start, end)
-        print(sql)
         cursor.execute(sql)
         data = {'date': [], 'price': []}
         for items in cursor.fetchall():
@@ -46,7 +45,7 @@ def get_stock_price(symbol, start, end):
             data['price'].append(price)
         sql = ("select `Date`, `Adj Close` from Fintech.{} where `Date` < '{}' ORDER BY `Date` DESC limit 256") \
             .format(symbol, start)
-        print(sql)
+
         cursor.execute(sql)
         data_training = {'date': [], 'price': []}
         for items in cursor.fetchall():
@@ -65,20 +64,16 @@ def get_stock_price(symbol, start, end):
 
 @require_http_methods(["POST"])
 def custom(request):
-    print(1)
-    symbol = 'CSCO'
     try:
-        print(request.body)
         body = json.loads(request.body)
+        symbol = body['symbol']['title']
+        stock_data = get_stock_price(symbol, body['start'], body['end'])
+        strategy = {'buy1': body['buy1'], 'buy2': body['buy2'], 'sell1': body['sell1'], 'sell2': body['sell2']}
+        holding_period, profit = SMA.fitness(stock_data['price'],
+                                             [body['buy1'], body['buy2'], body['sell1'], body['sell2']])
+        context = {'stock price': stock_data['price'][256:], 'holding period': holding_period, 'profit': profit,
+                   'strategy': strategy}
+        return JsonResponse(context)
     except Exception as e:
         print(e)
-    stock_data = get_stock_price(symbol, body['start'], body['end'])
-    print(3)
-    strategy = {'buy1': body['buy1'], 'buy2': body['buy2'], 'sell1': body['sell1'], 'sell2': body['sell2']}
-    print(4)
-    holding_period, profit = SMA.fitness(stock_data['price'],
-                                         [body['buy1'], body['buy2'], body['sell1'], body['sell2']])
-    print(5)
-    context = {'stock price': stock_data['price'][256:], 'holding period': holding_period, 'profit': profit,
-               'strategy': strategy}
-    return JsonResponse(context)
+        return JsonResponse({'status': 'fail', 'error': e})
