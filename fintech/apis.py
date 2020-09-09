@@ -25,11 +25,14 @@ def get_stock_list(request):
 
 @require_http_methods(["POST"])
 def recommend_sma(request):
-    body = json.loads(request.body)
-    symbol = body['symbol']['title']
-    stock_data = get_stock_price(symbol, body['start'], body['end'])
+    try:
+        body = json.loads(request.body)
+        symbol = body['symbol']['title']
+        stock_data = get_stock_price(symbol, body['start'], body['end'])
 
-    return JsonResponse(SMA.QTS(stock_data['price']))
+        return JsonResponse(SMA.QTS(stock_data['price']))
+    except Exception as e:
+        print(e)
 
 
 def get_stock_price(symbol, start, end):

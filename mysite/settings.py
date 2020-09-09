@@ -80,7 +80,7 @@ DATABASES = {
         'NAME': 'Fintech',
         'USER': 'user',
         'PASSWORD': 'pass',
-        'HOST': '163.22.17.114',
+        'HOST': '127.0.0.1',
         'POST': '3306',
     }
 }
