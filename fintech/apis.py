@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.db import connection
-import fintech.QTS_SMA as SMA
+import fintech.Model.QTS as qts
 import json
 
 
@@ -26,11 +26,15 @@ def get_stock_list(request):
 @require_http_methods(["POST"])
 def recommend_sma(request):
     try:
+        indicator = 'sma'
         body = json.loads(request.body)
         symbol = body['symbol']['title']
         stock_data = get_stock_price(symbol, body['start'], body['end'])
+        ti1, ti2, ti3, ti4, holding_period, profit, strategy = qts.QTS(stock_data['price'], indicator)
+        context = {'stock price': stock_data['price'][256:], 'holding period': holding_period, 'profit': profit,
+                   'strategy': strategy, 'ti1': ti1, 'ti2': ti2, 'ti3': ti3, 'ti4': ti4}
 
-        return JsonResponse(SMA.QTS(stock_data['price']))
+        return JsonResponse(context)
     except Exception as e:
         print(e)
 
@@ -68,12 +72,13 @@ def get_stock_price(symbol, start, end):
 @require_http_methods(["POST"])
 def custom(request):
     try:
+        indicator = 'sma'
         body = json.loads(request.body)
         symbol = body['symbol']['title']
         stock_data = get_stock_price(symbol, body['start'], body['end'])
         strategy = {'buy1': body['buy1'], 'buy2': body['buy2'], 'sell1': body['sell1'], 'sell2': body['sell2']}
-        holding_period, profit = SMA.fitness(stock_data['price'],
-                                             [body['buy1'], body['buy2'], body['sell1'], body['sell2']])
+        holding_period, profit = qts.fitness(stock_data['price'],
+                                             [body['buy1'], body['buy2'], body['sell1'], body['sell2']], indicator)
         context = {'stock price': stock_data['price'][256:], 'holding period': holding_period, 'profit': profit,
                    'strategy': strategy}
         return JsonResponse(context)
