@@ -17,8 +17,7 @@ def get_stock_list(request):
             return JsonResponse({'stock list': stocks})
         except Exception as e:
             print(e)
-            return JsonResponse({'status': 'database connection error'})
-        return JsonResponse({'status': 'ok'})
+            return JsonResponse({'status': 'database connection error', 'error': e})
 
     return JsonResponse({'status': 'fail'})
 
@@ -37,6 +36,7 @@ def recommend_sma(request):
         return JsonResponse(context)
     except Exception as e:
         print(e)
+        return JsonResponse({'status': 'fail', 'error': e})
 
 
 def get_stock_price(symbol, start, end):
