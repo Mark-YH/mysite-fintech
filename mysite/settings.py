@@ -76,12 +76,12 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Fintech',
-        'USER': 'user',
-        'PASSWORD': 'pass',
-        'HOST': '163.22.17.114',
-        'POST': '3306',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd1q9ua2rv5j96p',
+        'USER': 'solbmxqtuqmaay',
+        'PASSWORD': 'ddbb2e4cb7a5f8a670b7b6d595ced7dd9e4088a5a4aaac7a07a98e0fad9fea26',
+        'HOST': 'ec2-34-238-26-109.compute-1.amazonaws.com',
+        'POST': '5432',
     }
 }
 
@@ -127,5 +127,5 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 STATIC_URL = '/static/'
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_METHODS = ('GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS')

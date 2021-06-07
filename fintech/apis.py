@@ -9,7 +9,7 @@ def get_stock_list(request):
     if request.method == 'GET':
         try:
             cursor = connection.cursor()
-            sql = ("select `Symbol` from 'stocks'")
+            sql = ('select "Symbol" from Stocks')
             cursor.execute(sql)
             stocks = []
             for items in cursor.fetchall():
@@ -35,16 +35,15 @@ def recommend_sma(request):
 def get_stock_price(symbol, start, end):
     try:
         cursor = connection.cursor()
-        sql = ("select `Date`, `Adj Close` from {} where `Date` between '{}' and '{}'") \
-            .format(symbol, start, end)
+        sql = "select date, \"Adj Close\" from {} where date between '{}' and '{}'".format(symbol, start, end)
         cursor.execute(sql)
         data = {'date': [], 'price': []}
         for items in cursor.fetchall():
             date, price = items
             data['date'].append(date)
             data['price'].append(price)
-        sql = ("select `Date`, `Adj Close` from {} where `Date` < '{}' ORDER BY `Date` DESC limit 256") \
-            .format(symbol, start)
+        sql = "select date, \"Adj Close\" from {} where date < '{}' ORDER BY Date DESC limit 256".format(symbol,
+                                                                                                             start)
         cursor.execute(sql)
         data_training = {'date': [], 'price': []}
         for items in cursor.fetchall():
